@@ -2,7 +2,7 @@ package com.hidcom;
 
 public enum GetCommands implements GetCommand {
 
-	STATUSWERTE {
+	QPIGS {
 
 		@Override
 		public byte[] cmd() {
@@ -11,7 +11,7 @@ public enum GetCommands implements GetCommand {
 		}
 	},
 
-	STATUSWERTE2 {
+	QPIGS2 {
 
 		public byte[] cmd() {
 
