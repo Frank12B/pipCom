@@ -6,15 +6,15 @@ This application heavily depends on [nyholku's purejavahidapi](https://github.co
 
 Generally it has the follwing structure:
 
-com.Server:
-	Server.class: Processes reuests on Port 13000 (change it in the code).
-	CommandReceiver: Handles incomming commands, sends them to the solar inverter and sends the response back to the client 		(Commander).
+* com.Server:
+	* Server class: Processes reuests on Port 13000 (change it in the code).
+	* CommandReceiver class: Handles incomming commands, sends them to the solar inverter and sends the response back to the client 		  (Commander).
 	
-com.client:
-	Commander: Client that sends requests to the Server consisting of PIP commands.
+* com.client:
+	* Commander class: Client that sends requests to the Server consisting of PIP commands.
 	
-information:
-	Contains some classes that parse the server response and make further processing of the data more easy.
+* information:
+	* Contains some classes that parse the server response and make further processing of the data more easy.
 	
 ### Some examples to get started:
 
@@ -41,5 +41,3 @@ byte[] response = c.sendCmd(s.cmd("25"));
 System.out.println(new String(response, StandardCharsets.US_ASCII));
 
 ```
-//-----------------------------------------------------------------------//
-
