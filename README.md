@@ -41,3 +41,4 @@ byte[] response = c.sendCmd(s.cmd("25"));
 System.out.println(new String(response, StandardCharsets.US_ASCII));
 
 ```
+If a SetCommand was sent the server responses with 'NACK' (Not acknowleged) if the command failed or or (ACK) (Acknowledged) after successfull execution. This message can be decoded in using a String constructor using the ASCII Standard Charset.
