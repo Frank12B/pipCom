@@ -1,5 +1,5 @@
 # pipCom
-This simple communucation server for PIP devices is aimed for developers which want to gather data from their
+This simple communication server for PIP devices is aimed for developers which want to gather data from their
 solar inverter. It was created for the authors own usage and only tested with his PIP2424MSE.
 
 This application heavily depends on [nyholku's purejavahidapi](https://github.com/nyholku/purejavahidapi) which is used for general HID communication.
@@ -18,6 +18,10 @@ Generally it has the follwing structure:
 	
 * information:
 	* Contains some classes that parse the server response and make further processing of the data more easy.
+	
+The server runs on a raspberryPi 3 which is connected via USB cable to the connector. I wrote an additional background service that is collecting data and writes them to the database and a Ruby On Rails application uses it.
+
+I am using an intervall of 30s to send a bunch of requests to the inverter but measurements showed that much lower intervalls are possible (around 2s and 4 requests). 
 	
 ### Some examples to get started:
 
