@@ -13,6 +13,9 @@ Generally it has the follwing structure:
 * com.client:
 	* Commander class: Client that sends requests to the Server consisting of PIP commands.
 	
+* com.hidcom:
+	* Get/SetCommands: Commands that can be sent to the PIP. You can find an example usage below.
+	
 * information:
 	* Contains some classes that parse the server response and make further processing of the data more easy.
 	
