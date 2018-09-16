@@ -4,6 +4,11 @@ solar inverter. It was created for the authors own usage and only tested with hi
 
 This application heavily depends on [nyholku's purejavahidapi](https://github.com/nyholku/purejavahidapi) which is used for general HID communication.
 
+Dependencies:
+JNA.jar (Tested version 4.40, dependency of purejavahidapi)
+purejavahidapi.jar (see link above)
+
+
 Generally it has the follwing structure:
 
 * com.Server:
