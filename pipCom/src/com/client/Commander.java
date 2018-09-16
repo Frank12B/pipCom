@@ -15,14 +15,26 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.hidcom.GetCommand;
+import com.hidcom.GetCommands;
 import com.sendProtocol.SendProtocol;
+import com.server.PIPException;
+
+import information.DeviceSettingInfo;
 
 public class Commander implements Callable<byte[]> {
 	
 	private static final Logger logger = Logger.getLogger("com.server");
 	private byte[] cmd;
-	private static final ExecutorService service = Executors.newFixedThreadPool(4);
+	private String host;
+	private int port;
+	private final ExecutorService service = Executors.newSingleThreadExecutor();
 	
+	public Commander(String host, int port) {
+		this.host = host;
+		this.port = port;
+	}
 	
 	public byte[] sendCmd(byte[] cmd) {
 		
@@ -39,11 +51,13 @@ public class Commander implements Callable<byte[]> {
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			logger.logp(Level.SEVERE, 
 					this.getClass().getName(), 
-					"byte[] befehlSenden(byte[] cmd)", 
-					"Folgender Befehl konnte nicht innerhalb von 5 Sekunden ausgeführt werden: " 
-					+ cmd.toString(),
+					"byte[] sendCommand(byte[] cmd)", 
+					"Following command could not have been executed during 5s and reached the timeout: " 
+					+ new String(cmd, StandardCharsets.US_ASCII),
 					e);
-		} 
+		} finally {
+			service.shutdownNow();
+		}
 		
 		return null;
 	}
@@ -51,50 +65,65 @@ public class Commander implements Callable<byte[]> {
 	@Override
 	public byte[] call() throws Exception {
 		
-		try (final Socket socketServer = new Socket("raspberrypi", 13000)){
+		try (final Socket socketServer = new Socket(host, port)){
 			
 			DataOutputStream serverInput = null;
 			
 			try {
 				serverInput = new DataOutputStream(socketServer.getOutputStream());
 
-				logger.fine("Client-Eingabe: " + new String(cmd, StandardCharsets.US_ASCII));
+				logger.fine("Client-input: " + new String(cmd, StandardCharsets.US_ASCII));
 
-				// Ab zum Server:
+				// To the server:
 				serverInput.writeInt(cmd.length);
 				serverInput.write(cmd);
 				serverInput.flush();
 
-				logger.fine("Warten auf Server-Antwort...");
+				logger.fine("Waiting for server answer...");
 				DataInputStream pipInput = new DataInputStream(socketServer.getInputStream());
-				logger.fine("Eingabe vom Server erfolgt...");
+				logger.fine("Input from server...");
 				final byte[] result = new byte[300];
 				
 				int tmp;
 				int c = 0;
 				
-				while((tmp = pipInput.readByte())!= (byte) SendProtocol.sendeEnde()) {
+				while(!SendProtocol.isLast(tmp = pipInput.readByte())) {
 					result[c] = (byte) tmp;
 					c++;
 				}
 				
-				logger.info("Antwort erhalten!");
+				logger.info("Answer received!");
 				
 				logger.fine(new String(result, StandardCharsets.US_ASCII));
 
 				return result;
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Befehlsgeber IOException: " + e.getMessage(), e);
+				logger.log(Level.SEVERE, "IOException in Commander: " + e.getMessage(), e);
 			}
 			
 		} catch (UnknownHostException ex) {
-			logger.severe("UnknownHostException bei Verbindung zu Host 'localhost', Port 13000: " + ex.getMessage());
+			logger.severe("The host you want to connect to is not known! " + ex.getMessage());
 			System.exit(-1);
 		} catch (IOException ex) {
-			logger.severe("IOException bei Verbindung zu Host 'raspberrypie', Port 13000: " + ex.getMessage());
+			logger.severe("IOException during connection: " + ex.getMessage());
 			System.exit(-1);
 		}
 		
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		Commander c = new Commander("raspberrypi", 13000);
+		GetCommand g = GetCommands.ANZEIGE_BETRIEBSKONSTANTEN;
+		
+		DeviceSettingInfo ds = new DeviceSettingInfo(c.sendCmd(g.cmd()));
+		try {
+			ds.parseValues();
+		} catch (PIPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(ds.DEVICE_OUTPUT_SOURCE_PRIORITY);	
 	}
 }

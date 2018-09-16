@@ -13,6 +13,10 @@ import purejavahidapi.HidDeviceInfo;
 import purejavahidapi.InputReportListener;
 import purejavahidapi.PureJavaHidApi;
 
+/**
+ * @version 1.0
+ *
+ */
 public class Communicator {
 
 	private static HidDevice dev = null;	
@@ -26,8 +30,14 @@ public class Communicator {
 	}
 	
 	public void open() {
-		openHidDevice(vendor_id, product_id);
-		setInputListener(new AnswerListener());		
+		if (openHidDevice(vendor_id, product_id)) {
+			setInputListener(new AnswerListener());					
+		} else {
+			System.out.println("No suitable device found! Please check your device ids or ensure" + 
+							   " everything is plugged in!");
+			
+			System.exit(-1);
+		}
 	}
 
 	private boolean openHidDevice(int VENDOR_ID, int PRODUCT_ID) {
@@ -81,7 +91,7 @@ public class Communicator {
 					return dev.setOutputReport((byte) 0x00, input, 8) < 0 & dev.setOutputReport((byte) 0x00, tmp, 8) < 0;
 					
 				} catch (IllegalStateException ilex) {
-					throw new PIPException("Senden des outputreports fehlgeschlagen!");					
+					throw new PIPException("Sending output report to PIP returned 0 response!", input);					
 				}
 			}
 
@@ -89,7 +99,7 @@ public class Communicator {
 				return dev.setOutputReport((byte) 0x00, input, 8) > 0;
 				
 			} catch (IllegalStateException ilex) {
-				throw new PIPException("Senden des outputreports fehlgeschlagen!");					
+				throw new PIPException("Sending output report to PIP returned 0 response!", input);					
 			}
 	}
 

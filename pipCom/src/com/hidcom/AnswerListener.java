@@ -12,10 +12,9 @@ import purejavahidapi.InputReportListener;
 public class AnswerListener implements InputReportListener {
 	
 	/**
-	 * Dieser InputReportListener liest die Antwort des PIP und schreibt sie in
-	 * den übergebenen OutputStream.
+	 * This InputReportListener reads the answer of the PIP and writes the into an a Blocking array
+	 * queue which can be read by the 'CommandReceiver' which sends the answer back to the client.
 	 * 
-	 * @author Frank Brettreich
 	 * @version 1.0
 	 *
 	 */
@@ -29,7 +28,7 @@ public class AnswerListener implements InputReportListener {
 	public void onInputReport(HidDevice source, byte reportID, byte[] reportData, int reportLength) {
 		
 		try {
-			logger.log(Level.FINEST, "Füllstand der Queue: " + queue.size());
+			logger.log(Level.FINEST, "Size of queue (AnwerListener): " + queue.size());
 			final byte[] result = new byte[reportLength];
 			
 			for (int i = 0; i < reportLength; i++) {
@@ -39,12 +38,12 @@ public class AnswerListener implements InputReportListener {
 			logger.logp(Level.FINE, 
 					this.getClass().getName(), 
 					"onInputReport(HidDevice source, byte reportID, byte[] reportData, int reportLength)", 
-					"Nachricht vom PIP erhalten: " + new String(result, StandardCharsets.US_ASCII), result);
+					"Message receive from PIP: " + new String(result, StandardCharsets.US_ASCII), result);
 		} catch (InterruptedException e1) {
 			logger.logp(Level.SEVERE,
 					this.getClass().getName(), 
 					"onInputReport(HidDevice source, byte reportID, byte[] reportData, int reportLength)", 
-					"Nachricht vom PIP konnte nicht in der queue abgelegt werden!", 
+					"Message from PIP could not be put into the queue!!", 
 					e1);
 		}
 	}

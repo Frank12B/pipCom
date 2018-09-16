@@ -5,11 +5,12 @@ import java.util.Arrays;
 import com.server.PIPException;
 import com.sun.istack.internal.logging.Logger;
 
+/**
+ * @version 1.0
+ *
+ */
 public class DeviceSettingInfo implements Info {
 
-	/**
-	 * 
-	 */
 	public float GRID_RATING_VOLTAGE;
 	public float GRID_RATING_CURRENT;
 	public float AC_OUTPUT_RATING_VOLTAGE;
@@ -94,10 +95,10 @@ public class DeviceSettingInfo implements Info {
 
 
 	public void parseValues() throws PIPException{
-		
-		try {
 
 		for (int z = 0; z < 25; z++) {
+			
+			try {
 
 			switch (z) {
 			case 0:
@@ -205,10 +206,10 @@ public class DeviceSettingInfo implements Info {
 						"Something strange happended in parsing information values! Index " + z + " is not available.");
 				break;
 			}
-		}
-		
-		} catch (NumberFormatException ex) {
-			throw new PIPException(ex.getMessage());
+			
+			} catch (NumberFormatException ex) {
+				throw new PIPException("Invalid input received!", this.getClass().getName(), input[z], input);
+			}
 		}
 	}
 }

@@ -7,13 +7,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import com.hidcom.Communicator;
 
 /**
  * This server processes requests on port 13000 and puts them into a queue. From this queue only
  * one request will be processed at the same time.
  * 
- * @author Frank Brettreich
+ * @version 1.0
  * 
  */
 public class Server implements Runnable {
@@ -51,9 +52,9 @@ public class Server implements Runnable {
 					logger.fine("ServerSocket - accept done");
 					
 					// The further processing Thread uses a SingleThreadExecutor containing
-					// a BlockingQueue to prevent simultanuously requests on the PIP
+					// a BlockingQueue to prevent simultaneously requests on the PIP
 					try {
-						queue.put(new Thread(new CommandReveiver(clientSocket, com)));
+						queue.put(new Thread(new CommandReceiver(clientSocket, com)));
 					} catch (InterruptedException e) {
 						logger.logp(Level.SEVERE,
 								Server.class.getName(),

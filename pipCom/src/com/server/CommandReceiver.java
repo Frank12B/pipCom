@@ -21,45 +21,41 @@ import com.hidcom.Communicator;
 import com.sendProtocol.SendProtocol;
 
 /**
- * Diese Handlerklasse empfängt die PIP-Befehle, die von einem Commander
- * gesendet werden und schickt sie an den PIP.
+ * This class receives PIP commands sent by a 'Commander' instance and sends them to the PIP.
  * 
- * @author Frank Brettreich
  * @version 1.0
  */
-public class CommandReveiver implements Runnable {
+public class CommandReceiver implements Runnable {
 
 	private static final Logger logger = Logger.getLogger("com.server");
 	/**
-	 * Dies ist die Client-Verbindung.
+	 * This is the connection to the server.
 	 */
 	private Socket clientSocket;
 	/**
-	 * Dies ist die Verbindung zum PIP als HID-device
+	 * This is the connection to the PIP as HID device.
 	 */
 	private Communicator com;
 
 	/**
-	 * Konstruktor, dem der Client-Socket und ein Communicator-Objekt mit dem
-	 * PIP-HID-device übergeben wird.
+	 * Constructor taking two connections.
 	 * 
-	 * @param clientSocket
-	 *            Socket-Verbindung zum Client.
+	 * @param clientSocket Socket connection to the Server.
+	 * @param com Connection to the PIP as HID device.
 	 */
-	public CommandReveiver(Socket clientSocket, Communicator com) {
+	public CommandReceiver(Socket clientSocket, Communicator com) {
 		this.clientSocket = clientSocket;
 		this.com = com;
 	}
 
 	/**
-	 * Thread wird ausgeführt: PIP-Befehle werden vom Commander an diesen Thread
-	 * gesendet und anschließend zum PIP gesendet. Ein InputReportListener schreibt
-	 * die Antwort des PIP in den OutputStream. Der wird vom Befehlsgeber gelesen
-	 * und zurückgegeben.
+	 * Thread is executing; PIP commands are sent to this thread by a 'Commander' instance
+	 * and finally sent to the PIP. An 'InputReportListener' writes its answer into the 
+	 * 'OutputStream'. He will be read by the 'Commander' and returned.
 	 */
 	@Override
 	public void run() {
-		logger.fine("Thread " + Thread.currentThread().getId() + " für Clientanfrage gestartet !");
+		logger.fine("Thread " + Thread.currentThread().getId() + " started for client request!");
 		
 		final long duration = System.currentTimeMillis();
 		
@@ -70,14 +66,14 @@ public class CommandReveiver implements Runnable {
 
 			final int length = in.readInt();
 
-			logger.fine("Thread " + Thread.currentThread().getId() + ": " + "Länge des zu übergebenden Byte-Arrays: "
+			logger.fine("Thread " + Thread.currentThread().getId() + ": " + "Length of received byte array: "
 					+ length);
 
 			final byte[] input = new byte[length];
 
 			in.readFully(input);
 
-			logger.fine("Thread " + Thread.currentThread().getId() + ": Eingabe: "
+			logger.fine("Thread " + Thread.currentThread().getId() + ": Input: "
 					+ new String(input, StandardCharsets.US_ASCII));
 			
 			final ExecutorService service = Executors.newSingleThreadExecutor();
@@ -85,7 +81,7 @@ public class CommandReveiver implements Runnable {
 
 				@Override
 				public String call() throws Exception {
-					sendeErgebnis(input);
+					sendResult(input);
 					return null;
 				}
 				
@@ -95,39 +91,43 @@ public class CommandReveiver implements Runnable {
 				f.get(1000, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				logger.logp(Level.SEVERE,
-						"com.server.CommandReveiver", 
+						"com.server.CommandReceiver", 
 						"call()", 
 						"FutureTask interrupted!",
 						e);
 				
 			} catch (ExecutionException e) {
 				logger.logp(Level.SEVERE,
-						"com.server.CommandReveiver", 
+						"com.server.CommandReceiver", 
 						"call()", 
 						"FutureTask execution interrupted!",
 						e);
 				
 			} catch (TimeoutException e) {
 				logger.logp(Level.SEVERE,
-						"com.server.CommandReveiver", 
+						"com.server.CommandReceiver", 
 						"call()", 
 						"FutureTask timed out!",
 						e);
 			}
 
 		} catch (IOException e2) {
-			logger.logp(Level.SEVERE, "CommandReveiver", "run()", "Allgemeine IOException im PipClient!", e2);
+			logger.logp(Level.SEVERE, 
+						"CommandReceiver", 
+						"run()", 
+						"General IOException in CommandReceiver!", 
+						e2);
 		}
 		
-		logger.log(Level.INFO, "Dauer in Millisekunden: " + Long.toString((System.currentTimeMillis() - duration)));
+		logger.log(Level.INFO, "Execution time in Millisekunden: " + Long.toString((System.currentTimeMillis() - duration)));
 	}
 
-	private void sendeErgebnis(byte[] input) {
+	private void sendResult(byte[] input) {
 		
 		try {
 			com.sendeOutputReport(input);
 			
-			logger.finest("Outputreport wurde gesendet!");
+			logger.finest("Outputreport was sent successfully!");
 			
 			DataOutputStream out = null;
 			
@@ -143,40 +143,40 @@ public class CommandReveiver implements Runnable {
 					
 					for (byte b : ergebnis) {
 						out.writeByte(b);
-						logger.finest("Schreibe byte an Commander: " + b);
+						logger.finest("Write byte to Commander: " + b);
 						
 						if (b == 13)
 							eof = true;
 					}
 				}
 
-				out.writeByte(SendProtocol.sendeEnde());
-				logger.finest("Übertrage Abschlussbyte an Commander");
+				out.writeByte(SendProtocol.sendLast());
+				logger.finest("Send final byte to Commander!");
 
-				logger.fine("Ausgabe erfolgreich!");
+				logger.fine("Answer successfully sent!");
 				
 			} catch (SocketTimeoutException e) {
-				logger.warning("Client Socket Timeout wurde erreicht! Leere DataOutputStream....");
+				logger.warning("Client socket timeout reached!");
 				
 			} catch (IOException e) {
 				logger.logp(Level.SEVERE, 
-						"CommandReveiver",
-						"sendeErgebnis(byte[] input)", 
-						"DataOutputStream konnte nicht geöffnet werden!", 
+						"CommandReceiver",
+						"sendResult(byte[] input)", 
+						"DataOutputStream could not be opened!", 
 						e);
 				
 			} catch (InterruptedException e) {
 				logger.logp(Level.SEVERE, 
-						"CommandReveiver",
-						"sendeErgebnis(byte[] input)", 
-						"Das Warten auf die Eingabe einer Antwort in die Queue wurde unterbrochen!", 
+						"CommandReceiver",
+						"sendeResult(byte[] input)", 
+						"Waiting for input for an answer written into the queue was interrupted!", 
 						e);
 			}
 		} catch (PIPException e1) {
 			logger.logp(Level.SEVERE, 
 					this.getClass().getName(), 
-					"void sendeErgebnis(byte[] input)", 
-					"Output report konnte nicht gesendet werden!",
+					"void sendeResult(byte[] input)", 
+					"Output report could not be sent!",
 					e1);
 		}
 	}
