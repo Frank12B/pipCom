@@ -29,7 +29,6 @@ public class Commander implements Callable<byte[]> {
 	private byte[] cmd;
 	private String host;
 	private int port;
-	private final ExecutorService service = Executors.newSingleThreadExecutor();
 	
 	public Commander(String host, int port) {
 		this.host = host;
@@ -39,6 +38,8 @@ public class Commander implements Callable<byte[]> {
 	public byte[] sendCmd(byte[] cmd) {
 		
 		this.cmd = cmd;
+		
+		final ExecutorService service = Executors.newSingleThreadExecutor();
 		
 		final Future<byte[]> result = service.submit(this);
 		
