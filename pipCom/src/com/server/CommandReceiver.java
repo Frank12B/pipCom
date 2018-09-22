@@ -178,6 +178,8 @@ public class CommandReceiver implements Runnable {
 					"void sendeResult(byte[] input)", 
 					"Output report could not be sent!",
 					e1);
+		} finally {
+			AnswerListener.queue.clear();
 		}
 	}
 }

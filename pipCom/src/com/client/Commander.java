@@ -45,7 +45,7 @@ public class Commander implements Callable<byte[]> {
 		
 		try {
 			
-			final byte[] answer = result.get(5, TimeUnit.SECONDS);
+			final byte[] answer = result.get(2, TimeUnit.SECONDS);
 			
 			return answer;
 
