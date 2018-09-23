@@ -21,7 +21,8 @@ public class PIPException extends Exception {
 		super("Parsing of PIP response failed!" + 
 			  " Causing class: " + infoClass + 
 			  " Array of input values: " + Arrays.toString(input) +
-			  " Description: " + description);
+			  " Description: " + description +
+			  " Value: " + value);
 	}
 	
 	private static String showCommand(byte[] c) {

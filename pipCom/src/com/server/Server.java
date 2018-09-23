@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +23,7 @@ public class Server implements Runnable {
 	
 	private static int port = 13000;
 	private static Logger logger = Logger.getLogger("com");
-	public static final BlockingQueue<Thread> queue = new ArrayBlockingQueue<Thread>(20);
+	public static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(20);
 	
 	/**
 	 * IDs to identify your PIP inverter as HID device. In this case it is am PIP2424MSE
@@ -54,7 +56,7 @@ public class Server implements Runnable {
 					// The further processing Thread uses a SingleThreadExecutor containing
 					// a BlockingQueue to prevent simultaneously requests on the PIP
 					try {
-						queue.put(new Thread(new CommandReceiver(clientSocket, com)));
+						queue.put(new CommandReceiver(clientSocket, com));
 					} catch (InterruptedException e) {
 						logger.logp(Level.SEVERE,
 								Server.class.getName(),
@@ -80,14 +82,16 @@ public class Server implements Runnable {
 	}
 	
 	private static void executeQueue() {
-		Thread thread = new Thread(new Runnable() {
+		
+		final Thread thread = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
+				final ExecutorService ex = Executors.newSingleThreadExecutor();
 				
 				while (true) {
 					try {
-						queue.take().start();
+						ex.execute(queue.take());
 						logger.logp(Level.FINE,
 									this.getClass().getName(),
 									"static void executeQueue()", 

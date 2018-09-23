@@ -57,8 +57,6 @@ public class CommandReceiver implements Runnable {
 	public void run() {
 		logger.fine("Thread " + Thread.currentThread().getId() + " started for client request!");
 		
-		final long duration = System.currentTimeMillis();
-		
 		DataInputStream in = null;
 
 		try {			
@@ -118,8 +116,6 @@ public class CommandReceiver implements Runnable {
 						"General IOException in CommandReceiver!", 
 						e2);
 		}
-		
-		logger.log(Level.INFO, "Execution time in Millisekunden: " + Long.toString((System.currentTimeMillis() - duration)));
 	}
 
 	private void sendResult(byte[] input) {

@@ -65,6 +65,7 @@ public class Commander implements Callable<byte[]> {
 
 	@Override
 	public byte[] call() throws Exception {
+		final long duration = System.currentTimeMillis();
 		
 		try (final Socket socketServer = new Socket(host, port)){
 			
@@ -96,6 +97,8 @@ public class Commander implements Callable<byte[]> {
 				logger.info("Answer received!");
 				
 				logger.fine(new String(result, StandardCharsets.US_ASCII));
+				
+				logger.log(Level.INFO, "Execution time in Milliseconds: " + Long.toString((System.currentTimeMillis() - duration)));
 
 				return result;
 			} catch (IOException e) {
