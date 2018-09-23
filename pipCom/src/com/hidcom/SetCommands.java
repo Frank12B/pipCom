@@ -1,5 +1,11 @@
 package com.hidcom;
 
+/**
+ * Enumeration containing all PIP commands to set an attribute on the PIP.
+ * 
+ * @author Frank
+ *
+ */
 public enum SetCommands implements SetCommand {
 
 	SETZE_KONTROLL_PARAMETER_AUF_STANDART {
@@ -183,15 +189,16 @@ public enum SetCommands implements SetCommand {
 			return PipCommandGenerator.createBefehl(PipCommandGenerator.SET_BATTERY_TYPE + "01");
 		}
 	},
-	/**
-	 * Setze_BATTERIE_TYP_USER {
-	 * 
-	 * @Override public byte[] cmd(String wert) {
-	 * 
-	 *           return PipCommandGenerator.createBefehl(PipCommandGenerator.SET_BATTERY_TYPE + "02"); }
-	 *           
-	 */
-
+	
+	Setze_BATTERIE_TYP_USER {	
+		@Override 
+		public byte[] cmd(String wert) {
+	
+	          return PipCommandGenerator.createBefehl(PipCommandGenerator.SET_BATTERY_TYPE + "02");
+		}
+	},
+	          
+	
 	SETZE_BATTERIE_SCHLUSSSPANNUNG {
 		@Override
 		public byte[] cmd(String wert) {

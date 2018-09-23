@@ -24,6 +24,9 @@ public class AnswerListener implements InputReportListener {
 
 	public AnswerListener() {}
 
+	/* (non-Javadoc)
+	 * @see purejavahidapi.InputReportListener#onInputReport(purejavahidapi.HidDevice, byte, byte[], int)
+	 */
 	@Override
 	public void onInputReport(HidDevice source, byte reportID, byte[] reportData, int reportLength) {
 		

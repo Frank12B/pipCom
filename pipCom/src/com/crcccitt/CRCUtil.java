@@ -13,7 +13,7 @@ public class CRCUtil {
 	 *            - the CRC mask
 	 * @param isHex
 	 *            - if true, treat input string as hex, otherwise, treat as ASCII
-	 * @return
+	 * @return Converted String.
 	 */
 	public static String getCRC16CCITT(String inputStr, int polynomial, int crc, boolean isHex) {
 

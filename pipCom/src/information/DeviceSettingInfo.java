@@ -73,7 +73,7 @@ public class DeviceSettingInfo implements Info {
 	
 	public int DEVICE_OUTPUT_MODE;
 	/**
-	 * Only for KS&MKS 4k-5k
+	 * Only for 'KS' and 'MKS' 4k-5k:
 	 * 
 	 * 00: single machine output 01: parallel output 02: Phase 1 of 3 Phase output 
 	 * 03: Phase 2 of 3 Phase output 04: Phase 3 of 3 Phase output 

@@ -5,16 +5,24 @@ import com.server.PIPException;
 import information.Info;
 
 /**
+ * Parses data for device mode inquiry.
+ * 
  * @version 1.0
- *
  */
 public class PowerModeInfo implements Info {
 	
 	private String[] values;
 	public String powerMode;
 
-	public PowerModeInfo(byte[] ergebnis) {
-		this.values = convertBytes(ergebnis);
+	/**
+	 * Instantiates an object by taking a valid PIP response.
+	 *  
+	 * Method parseValues() must always be executed before the values are set!
+	 * 
+	 * @param result A valid answer from the PIP.
+	 */
+	public PowerModeInfo(byte[] result) {
+		this.values = convertBytes(result);
 	}
 
 	@Override

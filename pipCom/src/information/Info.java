@@ -4,6 +4,11 @@ import com.server.PIPException;
 
 public interface Info {
 
+	/**
+	 * Parses results to make them accessible via public variables.
+	 * 
+	 * @throws PIPException When a result contains invalid data.
+	 */
 	void parseValues() throws PIPException;
 	
 	default String[] convertBytes(byte[] response) {

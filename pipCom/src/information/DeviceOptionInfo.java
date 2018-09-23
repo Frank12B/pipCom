@@ -1,5 +1,10 @@
 package information;
 
+/**
+ * Parses data for setting parameters command.
+ * 
+ * @version 1.0 *
+ */
 public class DeviceOptionInfo implements Info {
 
 	public boolean ENABLED_SILENCE_BUZZER = false;;
@@ -15,10 +20,19 @@ public class DeviceOptionInfo implements Info {
 
 	private String[] values;
 
-	public DeviceOptionInfo(byte[] ergebnis) {
-		this.values = convertBytes(ergebnis);
+	/**
+	 * Instantiates an object by taking a valid PIP response.
+	 * Method parseValues() must always be executed before the values are set!
+	 * 
+	 * @param result A valid answer from the PIP.
+	 */
+	public DeviceOptionInfo(byte[] result) {
+		this.values = convertBytes(result);
 	}
 
+	/* (non-Javadoc)
+	 * @see information.Info#parseValues()
+	 */
 	public void parseValues() {
 		String enabled = values[0].substring(0, values[0].indexOf((char) 13) - 2);
 

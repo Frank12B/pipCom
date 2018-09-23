@@ -3,8 +3,9 @@ package information;
 import com.server.PIPException;
 
 /**
+ * Parses data from device general status parameters inquiry.
+ * 
  * @version 1.0
- *
  */
 public class QpigsRow implements Info {
 	
@@ -50,12 +51,22 @@ public class QpigsRow implements Info {
 	private String[] qpigs;
 	private String[] qpigs2;
  
+	/**
+	 * Instantiates an object by taking two valid responses from GetCommands.QPIGS and 
+	 * GetCommands.QPIGS2.
+	 * 
+	 * @param qpigs Response from GetCommands.QPIGS.
+	 * @param qpigs2 Response from GetCommands.QPIGS.
+	 */
 	public QpigsRow(byte[] qpigs, byte[] qpigs2) {
 
 		this.qpigs = convertBytes(qpigs);
 		this.qpigs2 = convertBytes(qpigs2);
 	}
 	
+	/* (non-Javadoc)
+	 * @see information.Info#parseValues()
+	 */
 	public void parseValues() throws PIPException {
 		getGrid_V();
 		getGrid_F();
