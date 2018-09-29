@@ -6,13 +6,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,10 +20,9 @@ import information.DeviceSettingInfo;
  * @author Frank
  *
  */
-public class Commander implements Callable<byte[]> {
+public class Commander {
 	
 	private static final Logger logger = Logger.getLogger("com.server");
-	private byte[] cmd;
 	private String host;
 	private int port;
 	
@@ -54,37 +46,6 @@ public class Commander implements Callable<byte[]> {
 	 */
 	public byte[] sendCmd(byte[] cmd) {
 		
-		this.cmd = cmd;
-		
-		final ExecutorService service = Executors.newSingleThreadExecutor();
-		
-		final Future<byte[]> result = service.submit(this);
-		
-		try {
-			
-			final byte[] answer = result.get(2, TimeUnit.SECONDS);
-			
-			return answer;
-
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			logger.logp(Level.SEVERE, 
-					this.getClass().getName(), 
-					"byte[] sendCommand(byte[] cmd)", 
-					"Following command could not have been executed during 5s and reached the timeout: " 
-					+ new String(cmd, StandardCharsets.US_ASCII),
-					e);
-		} finally {
-			service.shutdownNow();
-		}
-		
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.util.concurrent.Callable#call()
-	 */
-	@Override
-	public byte[] call() throws Exception {
 		final long duration = System.currentTimeMillis();
 		
 		try (final Socket socketServer = new Socket(host, port)){
@@ -122,7 +83,10 @@ public class Commander implements Callable<byte[]> {
 
 				return result;
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "IOException in Commander: " + e.getMessage(), e);
+				
+				logger.log(Level.SEVERE, "Clientsocket has probably been closed due to a server side timeout!" + 
+						" This is normal when restarting the server while running. Check the server logs" + 
+						" if this message appears too often.", e);
 			}
 			
 		} catch (UnknownHostException ex) {
@@ -134,6 +98,8 @@ public class Commander implements Callable<byte[]> {
 		}
 		
 		return null;
+		
+		
 	}
 	
 	public static void main(String[] args) {

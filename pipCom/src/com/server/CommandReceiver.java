@@ -107,6 +107,14 @@ public class CommandReceiver implements Runnable {
 						"call()", 
 						"FutureTask timed out!",
 						e);
+				
+				com.close();
+				com.open();
+				logger.logp(Level.SEVERE,
+						this.getClass().getName(),
+						"void run()", "Closing client socket because of timeout!");
+				
+				clientSocket.close();
 			}
 
 		} catch (IOException e2) {
