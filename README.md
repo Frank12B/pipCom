@@ -1,5 +1,5 @@
 # pipCom
-This simple communication server for PIP devices is aimed for developers which want to gather data from their
+This simple communication server for PIP devices is aimed for developers who want to gather data from their PIP
 solar inverter. It was created for the authors own usage and only tested with his PIP2424MSE.
 
 This application heavily depends on [nyholku's purejavahidapi](https://github.com/nyholku/purejavahidapi) which is used for general HID communication.
@@ -33,15 +33,28 @@ I am using an intervall of 30s to send a bunch of requests to the inverter but m
 This example gathers the most important actual solar parameters and puts them into an QpigsRow object that parses the responses 
 and lets you access its public values for further processing, e.g. putting them into a database.
 ```java
-Commander c = new Commander();
-GetCommand v = GetCommands.QPIGS;
+public static void main(String[] args) {
+	Commander c = new Commander("raspberrypi", 13000);
+	GetCommand v = GetCommands.QPIGS;
 
-byte[] first_response = c.sendCmd(v.cmd());
+	byte[] first_response = c.sendCmd(v.cmd());
 
-v = GetCommands.QPIGS2;
-byte[] second_response = c.sendCmd(v.cmd());
+	v = GetCommands.QPIGS2;
+	byte[] second_response = c.sendCmd(v.cmd());
 
-QpigsRow q = new QpigsRow(first_response, second_response);
+	QpigsRow q = new QpigsRow(first_response, second_response);
+	try {
+		q.parseValues();
+
+		System.out.println(q.battery_Charging_C);
+		System.out.println(q.pv1_Charging_P);
+		System.out.println(q.pv2_Charging_P);
+
+	} catch (PIPException e) {
+		System.out.println("Wrong input parameters received from PIP!");
+		e.printStackTrace();
+	}
+}
 ```
 This command sets the maximum charging current in [A] for the battery. The commands are still in German but will be translated when I find the time.
 ```java
