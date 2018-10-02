@@ -21,7 +21,7 @@ import com.hidcom.Communicator;
  */
 public class Server implements Runnable {
 	
-	private static int port = 13000;
+	private int port = 13000;
 	private static Logger logger = Logger.getLogger("com");
 	public static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(20);
 	
@@ -31,6 +31,10 @@ public class Server implements Runnable {
 	private static final int VENDOR_ID = (short) 0x0665;
 	private static final int PRODUCT_ID = (short) 0x5161;
 	private static final Communicator com = new Communicator(VENDOR_ID, PRODUCT_ID);
+	
+	public Server(int port) {
+		this.port = port;
+	}
 
 	/**
 	 * Server is listening on port 13000 and takes requests in an endless loop.
@@ -118,8 +122,26 @@ public class Server implements Runnable {
 	}
 	
 	public static void main(String[] args) {
-		Thread t = new Thread(new Server());
-		t.setName("PIP Communication Server");
-		t.start();
+		
+		int port = 0;
+		
+		for (int i = 0; i < args.length; i++) {
+			switch(args[i])	{
+			
+			case "-p":
+				i++;
+				port = Integer.parseInt(args[i]);
+				break;
+			}
+		}
+		
+		if (port > 0) {
+			Thread t = new Thread(new Server(port));
+			t.setName("PIP Communication Server");
+			t.start();			
+		} else {
+			System.err.println("Please make sure you used this program with the following params:");
+			System.err.println("-p: Portnumber for communication between client and server.");
+		}
 	}
 }
