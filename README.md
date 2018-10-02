@@ -12,7 +12,7 @@ purejavahidapi.jar (see link above)
 Generally it has the follwing structure:
 
 * com.Server:
-	* Server class: Processes reuests on Port 13000 (change it in the code).
+	* Server class: Processes requests on a user defined port which is passed as parameter.
 	* CommandReceiver class: Handles incomming commands, sends them to the solar inverter and sends the response back to the client 		  (Commander).
 	
 * com.client:
@@ -42,9 +42,9 @@ private static final int VENDOR_ID = (short) 0x0665;
 private static final int PRODUCT_ID = (short) 0x5161;
 ```
 
-Before exporting the project as jarfile you can configure the logger in the Server.java file (this is the "rootlogger" of the project) to define some textfiles or suppress the ConsoleLogger. How this is to be done you can be found in the internet. At the moment the communication port of the server is hardcoded as 13000. You have to change it in the code if you want to change it.
+Before exporting the project as jarfile you can configure the logger in the Server.java file (this is the "rootlogger" of the project) to define some textfiles or suppress the ConsoleLogger. How this is to be done you can be found in the internet. The communication port of the server can be passed as a parameter when executing the jarfile.
 
-After that export your project as jar file (by using ther 'Server' class main method) and execute it. You need to run it with 'sudo' on linux machines in order to be able to read the HID device. If this is done and no Exception appears you can use the Commander class to send commands to the Server as you can see in the examples below:
+After that export your project as jar file (by using ther 'Server' class main method) and execute it. You need to run it with 'sudo' on linux machines in order to be able to read the HID device. If this is done and no Exception appears you can use the Commander class (client side) to send commands to the Server as you can see in the examples below:
 
 This example gathers the most important actual solar parameters and puts them into an QpigsRow object that parses the responses 
 and lets you access its public values for further processing, e.g. putting them into a database.
